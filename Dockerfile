@@ -9,7 +9,7 @@ RUN npm run build
 # ETAP 2
 FROM node:22-alpine
 WORKDIR /app
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/build ./build
 COPY --from=builder /app/package*.json ./
 RUN npm ci --only=production
 
