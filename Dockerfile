@@ -15,4 +15,4 @@ RUN npm ci --only=production
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "build/main.js"]
