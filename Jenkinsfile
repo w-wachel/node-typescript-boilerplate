@@ -25,14 +25,14 @@ pipeline {
                 echo "Uruchamiam kontener do testow dymnych..."
                 sh "docker stop ${NAZWA_KONTENERA} || true"
                 sh "docker rm ${NAZWA_KONTENERA} || true"
-                sh "docker run -d --name ${NAZWA_KONTENERA} -p 3000:3000 ${NAZWA_OBRAZU}:${BUILD_NUMBER}"
+                sh "docker run -d --name ${NAZWA_KONTENERA} --network host ${NAZWA_OBRAZU}:${BUILD_NUMBER}"
             }
         }
 
         stage('4. Smoke Test') {
             steps {
                 echo "Sprawdzam czy aplikacja odpowiada..."
-                sleep 5
+                sleep 10
                 sh "curl -f http://localhost:3000"
             }
         }
