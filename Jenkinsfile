@@ -33,8 +33,7 @@ pipeline {
             steps {
                 echo "Sprawdzam czy aplikacja odpowiada..."
                 sleep 10
-                sh "curl -f http://localhost:3000"
-            }
+                sh "docker run --rm --network host alpine sh -c 'apk add --no-cache curl && curl -f http://localhost:3000'"            }
         }
     }
 
