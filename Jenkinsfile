@@ -59,6 +59,7 @@ pipeline {
                 sh "docker inspect ${NAZWA_OBRAZU}:${BUILD_NUMBER} > image_info.json"
             }
         }
+    }
 
     post {
         always {
@@ -68,4 +69,4 @@ pipeline {
             sh "docker stop ${NAZWA_KONTENERA} || true"
         }
     }
-}
+} // <--- TEJ KLAMRY BRAKOWAŁO!
