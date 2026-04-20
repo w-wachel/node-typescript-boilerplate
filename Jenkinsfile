@@ -69,4 +69,4 @@ pipeline {
             sh "docker stop ${NAZWA_KONTENERA} || true"
         }
     }
-} // <--- TEJ KLAMRY BRAKOWAŁO!
+}
