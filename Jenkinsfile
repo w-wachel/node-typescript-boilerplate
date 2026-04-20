@@ -30,20 +30,32 @@ pipeline {
             }
         }
 
-        stage('3. Uruchomienie (Integracja)') {
+        stage('3. Testy Jednostkowe') {
             steps {
-                echo "Uruchamiam kontener do testow dymnych..."
-                sh "docker stop ${NAZWA_KONTENERA} || true"
-                sh "docker rm ${NAZWA_KONTENERA} || true"
-                sh "docker run -d --name ${NAZWA_KONTENERA} --network host ${NAZWA_OBRAZU}:${BUILD_NUMBER}"
+                echo "Uruchamiam testy na obrazie BLDR..."
+                sh "docker run --rm ${NAZWA_OBRAZU}:BLDR npm test"
             }
         }
 
-        stage('4. Smoke Test') {
+        stage('4. Deploy - Sandbox') {
             steps {
-                echo "Sprawdzam czy aplikacja odpowiada..."
-                sleep 10
-                sh "docker run --rm --network host alpine sh -c 'apk add --no-cache curl && curl -f http://localhost:3000'"            }
+                echo "Uruchamiam Sandbox..."
+                sh "docker stop ${NAZWA_KONTENERA} || true"
+                sh "docker rm ${NAZWA_KONTENERA} || true"
+                
+                sh "docker run -d --name ${NAZWA_KONTENERA} -p 3000:3000 ${NAZWA_OBRAZU}:${BUILD_NUMBER}"
+            }
+        }
+
+        stage('5. Smoke Test & Publish') {
+            steps {
+                echo "Weryfikacja wdrożenia..."
+                sleep 5
+                sh "curl -f http://localhost:3000 || (docker logs ${NAZWA_KONTENERA} && exit 1)"
+                
+                echo "Publikowanie informacji o obrazie..."
+                sh "docker inspect ${NAZWA_OBRAZU}:${BUILD_NUMBER} > image_info.json"
+            }
         }
     }
 
@@ -51,7 +63,7 @@ pipeline {
         always {
             echo "Czyszczenie srodowiska i pobieranie logow..."
             sh "docker logs ${NAZWA_KONTENERA} > logi-z-testu-${BUILD_NUMBER}.txt"
-            archiveArtifacts artifacts: "*.txt", fingerprint: true
+            archiveArtifacts artifacts: "*.txt, *.json", fingerprint: true
             sh "docker stop ${NAZWA_KONTENERA} || true"
         }
     }
