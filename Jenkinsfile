@@ -43,22 +43,22 @@ pipeline {
                 sh "docker stop ${NAZWA_KONTENERA} || true"
                 sh "docker rm ${NAZWA_KONTENERA} || true"
                 
-                sh "docker run -d --name ${NAZWA_KONTENERA} -p 3000:3000 ${NAZWA_OBRAZU}:${BUILD_NUMBER}"
+                sh "docker run -d --name ${NAZWA_KONTENERA} --network host ${NAZWA_OBRAZU}:${BUILD_NUMBER}" 
             }
         }
 
         stage('5. Smoke Test & Publish') {
             steps {
-                echo "Weryfikacja wdrożenia..."
-                sleep 10
+                echo "Czekam aż aplikacja wstanie..."
+                sleep 15
                 
-                sh "docker run --rm --network host alpine curlimages/curl -f http://localhost:3000 || (docker logs ${NAZWA_KONTENERA} && exit 1)"
+                echo "Sprawdzam połączenie przez kontener zewnętrzny..."
+                sh "docker run --rm --network host curlimages/curl -f http://localhost:3000"
                 
-                echo "Publikowanie informacji o obrazie..."
+                echo "Publikowanie artefaktów..."
                 sh "docker inspect ${NAZWA_OBRAZU}:${BUILD_NUMBER} > image_info.json"
             }
         }
-    }
 
     post {
         always {
