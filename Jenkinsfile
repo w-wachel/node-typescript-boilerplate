@@ -19,10 +19,14 @@ pipeline {
             }
         }
 
-        stage('2. Budowanie Obrazu Docker') {
+        stage('2. Build - Tworzenie BLDR i Artefaktu') {
             steps {
-                echo "Rozpoczynam budowanie obrazu: ${NAZWA_OBRAZU}..."
+                echo "Buduję obraz budujący (BLDR)..."
+                sh "docker build --target builder -t ${NAZWA_OBRAZU}:BLDR ."
+                
+                echo "Buduję finalny obraz docelowy..."
                 sh "docker build -t ${NAZWA_OBRAZU}:${BUILD_NUMBER} ."
+                sh "docker tag ${NAZWA_OBRAZU}:${BUILD_NUMBER} ${NAZWA_OBRAZU}:latest"
             }
         }
 
