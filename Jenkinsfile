@@ -50,8 +50,9 @@ pipeline {
         stage('5. Smoke Test & Publish') {
             steps {
                 echo "Weryfikacja wdrożenia..."
-                sleep 5
-                sh "curl -f http://localhost:3000 || (docker logs ${NAZWA_KONTENERA} && exit 1)"
+                sleep 10
+                
+                sh "docker run --rm --network host alpine curlimages/curl -f http://localhost:3000 || (docker logs ${NAZWA_KONTENERA} && exit 1)"
                 
                 echo "Publikowanie informacji o obrazie..."
                 sh "docker inspect ${NAZWA_OBRAZU}:${BUILD_NUMBER} > image_info.json"
