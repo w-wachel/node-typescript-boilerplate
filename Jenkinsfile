@@ -7,9 +7,15 @@ pipeline {
     }
 
     stages {
-        stage('1. Pobieranie kodu') {
+        stage('1. Przygotowanie i Cleanup') {
             steps {
-                checkout scm
+                echo "Sprzątanie folderu roboczego..."
+                deleteDir()
+                
+                echo "Pobieranie świeżego kodu z SCM..."
+                checkout scm 
+
+                sh "docker system prune -f" 
             }
         }
 
